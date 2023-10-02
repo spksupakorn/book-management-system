@@ -1,4 +1,8 @@
 const prompt = require('prompt-sync')();
+const figlet = require('figlet');
+const chalk = require("chalk");
+const inquirer = require("inquirer");
+const alert = require("alert");
 
 function showMessage(message) {
     console.log('========================================');
@@ -8,6 +12,7 @@ function showMessage(message) {
 
 let books = [];
 
+//add book
 function addBook() {
     while(true) {
         showMessage('Please add a new book >>>');
@@ -86,27 +91,21 @@ function addBook() {
     }
 }
 
-function viewBooks() {
-    while(true) {
-        showMessage('List of Books >>>');
-        if (books.length === 0) {
-            console.log('No books added yet.');
-        } else {
-            books.forEach((book, index) => {
-                console.log(`#${index + 1}:`);
-                console.log(`Title: ${book.title}`);
-                console.log(`Author: ${book.author}`);
-                console.log(`Year: ${book.year}`);
-                console.log(`Prices: ${book.prices}`);
-                console.log('-------------------------');
-            });
-        }
-        let continueAdding = prompt('Do you want to exit to main menu ? (yes/no): ');
-        if (continueAdding.toLowerCase() !== 'no') {
-            showMessage('Returning to the main menu...');
-            return;
-        }
+function viewBooks(_callback) {
+    showMessage('List of Books >>>');
+    if (books.length === 0) {
+        console.log('No books added yet.');
+    } else {
+        books.forEach((book, index) => {
+            console.log(`#${index + 1}:`);
+            console.log(`Title: ${book.title}`);
+            console.log(`Author: ${book.author}`);
+            console.log(`Year: ${book.year}`);
+            console.log(`Prices: ${book.prices}`);
+            console.log('-------------------------');
+        });
     }
+    _callback();
 }
 
 function editBook() {
@@ -191,35 +190,67 @@ function deleteBook() {
         }
     }
 }
-
-while (true) {
-    console.log('<<<Welcome to kawaii book shop>>>');
-    console.log('1. Add a new book');
-    console.log('2. View books');
-    console.log('3. Edit a book');
-    console.log('4. Delete a book');
-    console.log('5. Quit');
-
-    const choice = prompt('Enter your choice (1, 2, 3, 4, 5): ');
-
-    switch (choice) {
-        case '1':
-        addBook();
-        break;
-        case '2':
-        viewBooks();
-        break;
-        case '3':
-        editBook();
-        break;
-        case '4':
-        deleteBook();
-        break;
-        case '5':
-        showMessage('Goodbye!');
-        process.exit();
-        default:
-        console.log('Invalid choice. Please enter 1, 2, 3, 4 or 5.');
+function main() {
+    inquirer.prompt([
+    {
+    name: "select",
+    message: "Please select your choices: ",
+    type: "list",
+    choices: [
+        "viewBooks",
+        "addBook",
+        "editBook",
+        "deleteBook",
+        "exit",
+    ],
+    }])
+    .then((answers) => {
+    if (answers["select"] == "viewBooks") {
+        viewBooks(function () {
+            let continueAdding = prompt('Do you want to exit to main menu ? (yes/no): ');
+            if (continueAdding.toLowerCase() !== 'no') {
+                showMessage('Returning to the main menu...');
+                main();
+            } 
+        });
+    } else if (answers["select"] == "addBook") {
+        addBook(function () {
+        alert(`Added book into system successfully`);
+        main();
+        });
+    } else if (answers["select"] == "editBook") {
+        editBook(function () {
+        alert(`Updated book details successfully`);
+        main();
+        });
+    } else if (answers["select"] == "deleteBook") {
+        deleteBook(function () {
+        alert(`Deleted book from system successfully `);
+        main();
+        });
+    } else {
+        exit();
     }
+    });
 }
+
+const options = {
+    font: 'Standard', 
+    horizontalLayout: 'default',
+    verticalLayout: 'default',
+};
+
+//CLI
+figlet.text('kawaii book store', options, function(err, data) {
+    if (err) {
+        console.log('Something went wrong...');
+        console.dir(err);
+        return;
+    }
+    console.log(chalk.blue(data));
+    main();
+});
+
+
+
 
