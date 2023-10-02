@@ -1,6 +1,6 @@
 const prompt = require('prompt-sync')();
 const figlet = require('figlet');
-const chalk = require("chalk");
+const chalk = require('chalk');
 const inquirer = require("inquirer");
 const alert = require("alert");
 
