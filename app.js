@@ -5,72 +5,77 @@ const inquirer = require("inquirer");
 const alert = require("alert");
 
 function showMessage(message) {
-    console.log('========================================');
     console.log(message);
     console.log('========================================');
 }
 
 let books = [];
 
-//add book
-function addBook() {
+//add books
+function addBook(_callback) {
     while(true) {
-        showMessage('Please add a new book >>>');
+        showMessage(chalk.yellow("Please add a new book >>>"));
         let title, author, year, prices;
 
         do {
-            title = prompt('Enter the title of the book (or type "quit" to exit): ');
-            if (title.toLowerCase() === 'quit') {
-                showMessage('Returning to the main menu...');
+            title = prompt(`${chalk.green("Enter the title of the book")} or type "${chalk.yellow("q")}" to exit${chalk.green(":")} `);
+            if (title.toLowerCase() === 'q') {
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
                 return;
             } else if (title && typeof title === 'string') {
                 break;
             } else if (!title) {
-                console.log('Please fill a title book.');
+                alert("Please fill a title book!");
             } else {
-                console.log('Title must be a string.');
+                alert("Title must be a string!");
             }
         } while (true);
 
         do {
-            author = prompt('Enter the author\'s name (or type "quit" to exit): ');
-            if (author.toLowerCase() === 'quit') {
-                showMessage('Returning to the main menu...');
+            author = prompt(`${chalk.green("Enter the author\'s name")} or type "${chalk.yellow("q")}" to exit${chalk.green(":")} `);
+            if (author.toLowerCase() === 'q') {
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
                 return;
             } else if (author && typeof author === 'string') {
                 break;
             } else if (!author) {
-                console.log('Please fill a author\'s name.');
+                alert("Please fill a author\'s name!");
             } else {
-                console.log('Author\'s must be a string.');
+                alert("Author\'s must be a string!");
             }
         } while (true);
 
         do {
-            year = prompt('Enter the publication year (or type "quit" to exit): ');
-            if (year.toLowerCase() === 'quit') {
-                showMessage('Returning to the main menu...');
+            year = prompt(`${chalk.green("Enter the publication year")} or type "${chalk.yellow("q")}" to exit${chalk.green(":")} `);
+            let yeartoNumber = parseInt(year, 10);
+            if (year.toLowerCase() === 'q') {
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
                 return;
-            } else if (year && typeof year === 'string') {
-                break;
+            } else if (isNaN(yeartoNumber)) {
+                alert("Year must be a number!");
             } else if (!year) {
-                console.log('Please fill the publication year.');
+                alert("Please fill the publication year!");
             } else {
-                console.log('Year must be a string.');
+                break;
             }
         } while (true);
 
         do {
-            prices = prompt('Enter the book prices (or type "quit" to exit): ');
-            if (prices.toLowerCase() === 'quit') {
-                showMessage('Returning to the main menu...');
+            prices = prompt(`${chalk.green("Enter the book prices")} or type "${chalk.yellow("q")}" to exit${chalk.green(":")} `);
+            let pricestoNumber = parseInt(prices, 10);
+            if (prices.toLowerCase() === 'q') {
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
                 return;
-            } else if (prices && typeof prices === 'string') {
-                break;
+            } else if (isNaN(pricestoNumber)) {
+                alert("Prices must be a number!");
             } else if (!prices) {
-                console.log('Please fill prices of book.');
+                alert("Please fill prices of book!");
             } else {
-                console.log('Prices must be a string.');
+                break;
             }
         } while (true);
 
@@ -82,110 +87,201 @@ function addBook() {
         };
 
         books.push(book);
-        showMessage(`You have added ${title} successfully!`);
-        let continueAdding = prompt('Do you want to add another book? (yes/no): ');
+        alert(`You have added ${title} successfully!`);
+        let continueAdding = prompt(`Do you want to add another book? (${chalk.yellow("yes/no")}): `);
         if (continueAdding.toLowerCase() !== 'yes') {
-            showMessage('Returning to the main menu...');
+            showMessage(chalk.yellow("Returning to the main menu..."));
+            _callback();
             return;
         }
     }
 }
 
+//view books
 function viewBooks(_callback) {
-    showMessage('List of Books >>>');
-    if (books.length === 0) {
-        console.log('No books added yet.');
-    } else {
-        books.forEach((book, index) => {
-            console.log(`#${index + 1}:`);
-            console.log(`Title: ${book.title}`);
-            console.log(`Author: ${book.author}`);
-            console.log(`Year: ${book.year}`);
-            console.log(`Prices: ${book.prices}`);
-            console.log('-------------------------');
-        });
+    while(true) {
+        showMessage(chalk.yellow("List of Books >>>"));
+        if (books.length === 0) {
+            console.log(chalk.red("No books added yet."));
+        } else {
+            books.forEach((book, index) => {
+                console.log(chalk.blue(`#${index + 1}:`));
+                console.log(chalk.blue(`Title: ${book.title}`));
+                console.log(chalk.blue(`Author: ${book.author}`));
+                console.log(chalk.blue(`Year: ${book.year}`));
+                console.log(chalk.blue(`Prices: ${book.prices}`));
+                console.log('-------------------------');
+            });
+        }
+        let continueAdding = prompt("Please put any key to return the main menu: ");
+        if (continueAdding || !continueAdding) {
+            showMessage(chalk.yellow("Returning to the main menu..."));
+            _callback();
+            return;
+        }
     }
-    _callback();
 }
 
-function editBook() {
+//edit books
+function editBook(_callback) {
     while(true) {
-        showMessage('Edit Book Details:');
+        showMessage(chalk.yellow("Edit Book Details:"));
         let bookIndex;
 
         if (books.length === 0) {
-            console.log('No books added yet.');
-            let continueAdding = prompt('Please put any key to return the main menu: ');
+            console.log(chalk.red("No books added yet."));
+            let continueAdding = prompt("Please put any key to return the main menu: ");
             if (continueAdding || !continueAdding) {
-                showMessage('Returning to the main menu...');
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
                 return;
             }
         }
 
-        console.log('Select a book to edit:');
+        console.log(chalk.yellow("Select a book to edit: "));
         books.forEach((book, index) => {
-            console.log(`#${index + 1}: ${book.title}`);
+            console.log(chalk.blue(`#${index + 1}: ${book.title}`));
         });
 
         do {
-            bookIndex = parseInt(prompt('Enter the number of the book you want to edit: '), 10);
+            bookIndex = parseInt(prompt(`${chalk.green("Enter the number of the book you want to edit:")} `), 10);
             if (isNaN(bookIndex) || bookIndex < 1 || bookIndex > books.length) {
-                console.log('Invalid book selection, please check number parameter.');
-            } else  {
+                console.log(chalk.red("Invalid book selection, please check number parameter!"));
+                let msg = prompt(`Press any key to enter number book again (or type "${chalk.yellow("q")}" to exit): `);
+                if (msg.toLowerCase() === 'q') {
+                    showMessage(chalk.yellow("Returning to the main menu..."));
+                    _callback();
+                    return;
+                } 
+            } else {
                 break;
             }
         } while (true);
 
         let selectedBook = books[bookIndex - 1];
 
-        showMessage('Edit Book Details:');
-        selectedBook.title = prompt(`Enter new title of book (current title: ${selectedBook.title}): `) || selectedBook.title;
-        selectedBook.author = prompt(`Enter new author name (current author: ${selectedBook.author}): `) || selectedBook.author;
-        selectedBook.year = prompt(`Enter new publication year (current year: ${selectedBook.year}): `) || selectedBook.year;
-        selectedBook.prices = prompt(`Enter new prices of book (current prices: ${selectedBook.prices}): `) || selectedBook.prices;
+        showMessage(chalk.yellow("Edit Book Details:"));
+        let title, author, year, prices;
 
-        showMessage(`Updated details book number ${bookIndex} successfully!`);
-        let continueAdding = prompt('Do you want to edit details another book? (yes/no): ');
+        do {
+            title = prompt(`${chalk.green(`Enter new title of book (current title: ${chalk.blue(`${selectedBook.title}`)})`)} or type "${chalk.yellow("q")}" to exit${chalk.green(":")} `);
+            if (title.toLowerCase() === 'q') {
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
+                return;
+            } else if (title && typeof title === 'string') {
+                break;
+            } else if (!title) {
+                alert("Please fill a title book!");
+            } else {
+                alert("Title must be a string!");
+            }
+        } while(true);
+
+        do {
+            author = prompt(`${chalk.green(`Enter new author name (current author: ${chalk.blue(`${selectedBook.author}`)})`)} or type "${chalk.yellow("q")}" to exit${chalk.green(":")} `);
+            if (author.toLowerCase() === 'q') {
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
+                return;
+            } else if (author && typeof author === 'string') {
+                break;
+            } else if (!author) {
+                alert("Please fill a author\'s name!");
+            } else {
+                alert("Author\'s must be a string!");
+            }
+        } while(true);
+
+        do {
+            year = prompt(`${chalk.green(`Enter new publication year (current year: ${chalk.blue(`${selectedBook.year}`)})`)} or type "${chalk.yellow("q")}" to exit)${chalk.green(":")}` );
+            let yeartoNumber = parseInt(year, 10);
+            if (year.toLowerCase() === 'q') {
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
+                return;
+            } else if (isNaN(yeartoNumber)) {
+                alert("Year must be a number!");
+            } else if (!year) {
+                alert("Please fill the publication year!");
+            } else {
+                break;
+            }
+        } while(true);
+        
+        do {
+            prices = prompt(`${chalk.green(`Enter new prices of book (current prices: ${chalk.blue(`${selectedBook.prices}`)})`)} or type "${chalk.yellow("q")}" to exit${chalk.green(":")} `);
+            let pricestoNumber = parseInt(prices, 10);
+            if (prices.toLowerCase() === 'q') {
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
+                return;
+            } else if (isNaN(pricestoNumber)) {
+                alert("Prices must be a number!");
+            } else if (!prices) {
+                alert("Please fill prices of book!");
+            } else {
+                break;
+            }
+        } while(true);
+
+        selectedBook.title = title;
+        selectedBook.author = author;
+        selectedBook.year = year;
+        selectedBook.prices = prices;
+        
+        alert(`Updated details book number ${bookIndex} successfully!`);
+        let continueAdding = prompt(`Do you want to edit details another book? (${chalk.yellow("yes/no")}): `);
         if (continueAdding.toLowerCase() !== 'yes') {
-            showMessage('Returning to the main menu...');
+            showMessage(chalk.yellow("Returning to the main menu..."));
+            _callback();
             return;
         }
     }
 }
 
-function deleteBook() {
+//delete books
+function deleteBook(_callback) {
     while(true) {
-        showMessage('Delete a Book:');
+        showMessage(chalk.yellow("Delete a Book:"));
         let bookIndex;
 
         if (books.length === 0) {
-            console.log('No books added yet.');
-            let continueAdding = prompt('Please put any key to return the main menu: ');
+            console.log(chalk.red("No books added yet."));
+            let continueAdding = prompt("Please put any key to return the main menu: ");
             if (continueAdding || !continueAdding) {
-                showMessage('Returning to the main menu...');
+                showMessage(chalk.yellow("Returning to the main menu..."));
+                _callback();
                 return;
             }
         }
 
-        console.log('Select a book to delete:');
+        console.log(chalk.yellow("Select a book to delete:"));
         books.forEach((book, index) => {
-            console.log(`#${index + 1}: ${book.title}`);
+            console.log(chalk.blue(`#${index + 1}: ${book.title}`));
         });
 
         do {
-            bookIndex = parseInt(prompt('Enter the number of the book you want to delete: '), 10);
+            bookIndex = parseInt(prompt(`${chalk.green("Enter the number of the book you want to delete:")} `), 10);
             if (isNaN(bookIndex) || bookIndex < 1 || bookIndex > books.length) {
-                console.log('Invalid book selection, please check number parameter.');
-            } else  {
+                console.log(chalk.red("Invalid book selection, please check number parameter!"));
+                let msg = prompt(`Press any key to enter number book again (or type "${chalk.yellow("q")}" to exit): `);
+                if (msg.toLowerCase() === 'q') {
+                    showMessage(chalk.yellow("Returning to the main menu..."));
+                    _callback();
+                    return;
+                } 
+            } else {
                 break;
             }
         } while (true);
         
         let deletedBook = books.splice(bookIndex - 1, 1);
-        showMessage(`Deleted book name '${deletedBook[0].title}' successfully!`);
-        let continueAdding = prompt('Do you want to delete another book? (yes/no): ');
+        alert(`Deleted book name '${deletedBook[0].title}' successfully!`);
+        let continueAdding = prompt(`Do you want to delete another book? (${chalk.yellow("yes/no")}): `);
         if (continueAdding.toLowerCase() !== 'yes') {
-            showMessage('Returning to the main menu...');
+            showMessage(chalk.yellow("Returning to the main menu..."));
+            _callback();
             return;
         }
     }
@@ -197,57 +293,45 @@ function main() {
     message: "Please select your choices: ",
     type: "list",
     choices: [
-        "viewBooks",
-        "addBook",
-        "editBook",
-        "deleteBook",
-        "exit",
+        "View books",
+        "Add a new book",
+        "Edit a book",
+        "Delete a book",
+        "Exit",
     ],
     }])
     .then((answers) => {
-    if (answers["select"] == "viewBooks") {
+    if (answers["select"] == "View books") {
         viewBooks(function () {
-            let continueAdding = prompt('Do you want to exit to main menu ? (yes/no): ');
-            if (continueAdding.toLowerCase() !== 'no') {
-                showMessage('Returning to the main menu...');
-                main();
-            } 
+            main();
         });
-    } else if (answers["select"] == "addBook") {
+    } else if (answers["select"] == "Add a new book") {
         addBook(function () {
-        alert(`Added book into system successfully`);
-        main();
+            main();
         });
-    } else if (answers["select"] == "editBook") {
+    } else if (answers["select"] == "Edit a book") {
         editBook(function () {
-        alert(`Updated book details successfully`);
-        main();
+            main();
         });
-    } else if (answers["select"] == "deleteBook") {
+    } else if (answers["select"] == "Delete a book") {
         deleteBook(function () {
-        alert(`Deleted book from system successfully `);
-        main();
+            main();
         });
     } else {
-        exit();
-    }
+            showMessage(chalk.yellow("Good bye!"));
+            process.exit();
+        }
     });
 }
 
-const options = {
-    font: 'Standard', 
-    horizontalLayout: 'default',
-    verticalLayout: 'default',
-};
-
-//CLI
-figlet.text('kawaii book store', options, function(err, data) {
+//Command Line Inteface
+figlet.text('kawaii book store', function(err, data) {
     if (err) {
         console.log('Something went wrong...');
         console.dir(err);
         return;
     }
-    console.log(chalk.blue(data));
+    console.log(chalk.magenta(data));
     main();
 });
 
